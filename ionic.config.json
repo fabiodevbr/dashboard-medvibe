@@ -1,0 +1,7 @@
+{
+  "name": "dashboard-medvibe",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
