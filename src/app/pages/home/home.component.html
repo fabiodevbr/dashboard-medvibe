@@ -1,0 +1,137 @@
+<ion-header>
+    <ion-toolbar mode="ios">
+        <ion-segment [(ngModel)]="segment" value="graph">
+            <ion-segment-button value="graph">
+                <ion-label>Gráficos</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="list">
+                <ion-label>Listagem</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="recomendation">
+                <ion-label>Recomendação</ion-label>
+            </ion-segment-button>
+        </ion-segment>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div style="padding: 24px; " *ngIf="segment === 'graph'">
+        <div class="content-graphs">
+            <div class="graph-big">
+                <div *ngFor="let item of perguntasGraficoEmoji" class="grafico-container-bar">
+                    <div *ngIf="item.tipo === 'emoji-click'">
+                        <h2 class="frase">{{item.pergunta}}</h2>
+                        <canvas baseChart [data]="item.grafico.barChartData" [options]="barChartOptions"
+                            [plugins]="barChartPlugins" [legend]="barChartLegend" [type]="'bar'">
+                        </canvas>
+                    </div>
+                </div>
+                <div *ngFor="let item of perguntasGraficoNumber" class="grafico-container-bar">
+                    <div *ngIf="item.tipo === 'number-click'">
+                        <h2 class="frase">{{item.pergunta}}</h2>
+
+                        <div class="content-graphs-progress">
+                            <div class="spinner-container">
+                                <div class="spinner-circle" [style.stroke-dashoffset]="item.grafico.degrees"
+                                    [style.stroke]="'#000'">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="45" />
+                                    </svg>
+                                    <div class="spinner-text">{{ item.grafico.nps }}%</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div *ngFor="let number of item.grafico.quantidade | keyvalue" class="progress-percent">
+                                    <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                                        <span>Nota {{ number.key }}:</span>
+
+                                        <span>{{ number.value }} / {{percentageWidth(number.value, item.grafico.maximo,
+                                            item.grafico.nps).percent}}%</span>
+                                    </div>
+                                    <ion-progress-bar style="    height: 8px;"
+                                        [value]="percentageWidth(number.value, item.grafico.maximo, item.grafico.nps).int"></ion-progress-bar>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="grid-container">
+                <div *ngFor="let item of perguntasGraficoBoolean" class="grafico-container">
+                    <div *ngIf="item.tipo === 'less-emoji-click' || item.tipo === 'boolean-click'">
+                        <h2 class="frase">{{item.pergunta}}</h2>
+                        <canvas baseChart height="20vh" width="20vw" [type]="'pie'"
+                            [datasets]="item.grafico.pieChartDatasets" [labels]="item.grafico.pieChartLabels"
+                            [options]="pieChartOptions" [plugins]="pieChartPlugins" [legend]="pieChartLegend">
+                        </canvas>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+    <div *ngIf="segment === 'list'">
+        <ion-list>
+            <ion-item>
+
+                <ion-label style="font-weight: 600; font-size: 14px;">
+                    Data criação
+                </ion-label>
+
+                <ion-text style="font-size: 12px;">Nota</ion-text>
+            </ion-item>
+
+            <ion-item *ngFor="let item of listagem; let index = index" (click)="setOpen(true, item)">
+
+                <ion-label>
+                    <p>Novo feedback:</p>
+                    <ion-text>{{item.dateOjb.dataNumerica}} - {{item.dateOjb.hora}}</ion-text>
+                </ion-label>
+
+                <ion-badge [color]="colorBadge(item.percentual)">{{item.percentual}}</ion-badge>
+            </ion-item>
+        </ion-list>
+    </div>
+
+    <div *ngIf="segment === 'recomendation'" class="container">
+        <h1>Recomendação - 15/03/2024</h1>
+        <div class="recomendacao">
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed fringilla lacinia convallis. Morbi eget mauris eros. 
+            Sed vel fermentum velit. Duis auctor mi id luctus convallis. Cras nec ipsum vel ipsum sodales tincidunt a vel turpis. 
+            Nulla in nulla id est vestibulum semper nec vitae dui. In hac habitasse platea dictumst.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed fringilla lacinia convallis. Morbi eget mauris eros. 
+            Sed vel fermentum velit. Duis auctor mi id luctus convallis. Cras nec ipsum vel ipsum sodales tincidunt a vel turpis. 
+            Nulla in nulla id est vestibulum semper nec vitae dui. In hac habitasse platea dictumst.
+          </p>
+        </div>
+    </div>
+
+</ion-content>
+
+<ion-modal [isOpen]="isModalOpen">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{itemSelecionado.dateOjb.dataNumerica}} - {{itemSelecionado.dateOjb.hora}}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="setOpen(false)">Fechar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <div class="lista-perguntas" *ngFor="let perguntaResposta of itemSelecionado.respostas">
+            <h3>{{ perguntaResposta.pergunta }}</h3>
+            <p>Resposta: {{ perguntaResposta.resposta }}</p>
+          </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
